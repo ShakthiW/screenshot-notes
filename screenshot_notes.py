@@ -4,6 +4,7 @@ import tkinter as tk
 import subprocess
 from PIL import Image, ImageTk
 from pynput import keyboard
+from screenshot_notes_viewer import ScreenshotNotesViewer
 
 # Directory to save screenshots and notes
 SAVE_DIR = "screenshots_notes"
@@ -137,6 +138,22 @@ def check_permissions():
         print(f"Permission check failed: {str(e)}")
         return False
 
+def show_notes_viewer(root):
+    """Launch the screenshots notes viewer interface"""
+    # Hide the root window if it's visible
+    root.withdraw()
+    
+    # Create a new toplevel window for the viewer
+    viewer_window = tk.Toplevel(root)
+    viewer_app = ScreenshotNotesViewer(viewer_window)
+    
+    # When viewer window is closed, show the root window again
+    def on_viewer_close():
+        viewer_window.destroy()
+        # Don't show the root window since it should stay hidden
+    
+    viewer_window.protocol("WM_DELETE_WINDOW", on_viewer_close)
+
 if __name__ == "__main__":
     if not check_permissions():
         print("Please grant accessibility permissions and try again.")
@@ -145,6 +162,36 @@ if __name__ == "__main__":
     # Create a persistent Tk root (in the main thread)
     root = tk.Tk()
     root.withdraw()  # Hide the root window
+    
+    # Create a system tray icon or menu if supported
+    # Otherwise show a small control window
+    control_window = tk.Toplevel(root)
+    control_window.title("Screenshot Notes")
+    control_window.geometry("250x100")
+    control_window.resizable(False, False)
+    
+    instruction_label = tk.Label(
+        control_window, 
+        text="Press Cmd+Shift+6 to capture\na screenshot and add a note.",
+        justify=tk.CENTER
+    )
+    instruction_label.pack(pady=10)
+    
+    view_button = tk.Button(
+        control_window, 
+        text="View All Screenshots", 
+        command=lambda: show_notes_viewer(root)
+    )
+    view_button.pack(pady=5)
+    
+    # When the control window is closed, exit the application
+    def on_control_close():
+        try:
+            root.quit()
+        except:
+            pass
+    
+    control_window.protocol("WM_DELETE_WINDOW", on_control_close)
 
     print("Starting screenshot note tool...")
 
@@ -156,7 +203,7 @@ if __name__ == "__main__":
     with keyboard.Listener(
             on_press=for_canonical(hotkey.press),
             on_release=for_canonical(hotkey.release)) as listener:
-        print("Running... Press Cmd+Shift+S to capture screenshot and add a note.")
+        print("Running... Press Cmd+Shift+6 to capture screenshot and add a note.")
         try:
             # Start the Tkinter main loop in the main thread
             root.mainloop()

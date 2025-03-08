@@ -1,0 +1,57 @@
+task_classification_task:
+  description: >
+    Classify the task into categories based on the context and the user's request in this note: {note} and the screenshot is: {screenshot_url}.
+    Tasks can only be of 2 types: 
+      - Summarize notes: Summarize the notes of the user from the screenshot. Here the user doesn't have any specific instructions with the notes
+      - Actions: This is when the user specifies an action to be performed with the screenshot.
+  expected_output: >
+    A JSON object with the following format:
+    {
+      "task_type": "Summarize notes" or "Actions",
+      "notes": "{note}",
+      "screenshot": "{screenshot_url}"
+    }
+
+summarize_notes_task:
+  description: >
+    Summarize the notes of the user from the screenshot in this note: {note} and the screenshot is: {screenshot_url}
+  expected_output: >
+    A JSON object with the following format:
+    {
+      "notes": "{note}",
+      "screenshot": "{screenshot_url}",
+      "summary": "{summary}"
+    }
+
+action_classification_task:
+  description: >
+    Classify the action into categories based on the context and the user's request in this note: {note} and the screenshot is: {screenshot_url}.
+    Action can only be of 3 types: 
+      - Research: If the user wants to research something from the screenshot this action should be performed.
+      - Reminder: If the user wants to set a reminder for something from the screenshot this action should be performed.
+      - Other: If the action is not related to the above 2, then it is of type Other.
+  expected_output: >
+    A JSON object with the following format:
+    {
+      "task_type": "Actions",
+      "action": "research" or "reminder" or "other",
+      "screenshot": "{screenshot_url}"
+    }
+
+research_task:
+  description: >
+    Research the screenshot and provide the user with the information.
+  expected_output: >
+    Give a detailed markdown report of the screenshot and the notes provided by the user.
+    Screenshot: {screenshot_url}
+    Notes: {notes}
+
+reminder_task:
+  description: >
+    Set a reminder for the user for the screenshot with a note as the {note} for the reminder.
+    The current time is {current_time}
+  expected_output: >
+    The tool is called successfully and the reminder is set.
+    Reminder: {note}
+    Screenshot: {screenshot_url}
+    Time: {current_time}
